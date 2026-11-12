@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cartas 101–200</title>
+<style>
+:root{--bg:#0d0d12;--papel:#e9e9de;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--papel);font-family:Georgia,"Times New Roman",serif}
+.app{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 16px 18px}
+.caja{position:relative;width:min(96vw,62vh,560px);aspect-ratio:1;flex:none;margin:auto 0}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated}
+#carta{position:absolute;left:22%;right:22%;top:29%;bottom:29%;display:flex;align-items:center;justify-content:center;overflow:auto;color:#0d0d12;text-align:center;line-height:1.3;opacity:0;transition:opacity .6s}
+#carta.v{opacity:1}
+#txt{margin:0;width:100%;font-size:18px}
+.pie{flex:none;text-align:center;width:100%}
+#num{width:55%;max-width:240px;font:inherit;font-size:42px;text-align:center;background:transparent;border:0;border-bottom:2px solid var(--papel);color:var(--papel);outline:none;padding:4px}
+#num::placeholder{color:var(--papel);opacity:.45}
+.ayuda{font-size:13px;opacity:.8;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="caja">
+    <canvas id="f"></canvas>
+    <div id="carta"><p id="txt"></p></div>
+  </div>
+  <div class="pie">
+    <input id="num" type="number" inputmode="numeric" min="101" max="200" placeholder="101–200" autocomplete="off">
+    <div class="ayuda" id="ayuda">Escribe un número del 101 al 200</div>
+  </div>
+</div>
+<script>
+var CARTAS = [
+"Quiero ser Charly García si en la pileta estás tú, lanzarme sin temor al fondo de tu cora",
+"Ya no ruego por un beso, es más íntimo rogarte por tu tiempo y una mirada tuya",
+"Soy un extranjero en la frontera de tus mejillas, quiero sacar la visa para estar pegado cual chicle en un pupitre",
+"Soy también un turista de tus manos, quiero ser residente para tocarlas cuando se me dé la gana",
+"No solo son palabras bonitas, estos son sentimientos disfrazados de letras, y ni siquiera se acercan a describir o definir lo que siento cuando digo tu nombre",
+"Cuando me acuerdo de ti, de tu voz melodiosa, uso cartas para expresarlo y ni siquiera es suficiente",
+"Diosa preciosa, te deseo en mi mente, el corto circuito qué me provocas tan bonito se siente",
+"Mirada penetrante y tan misteriosa, te dedico todas mis prosas, todas las letras y mis desvelos buscando rimas y cosas que te describan",
+"Me pongo cursi y empalagoso, adicto y con ganas de hablarte como en la 3 y 94, se suma la 107, pero dios, tu belleza me somete me idiotiza y me sorprende, te puedo decir más cosas así?",
+"Quiero ver tus lunares y encontrar inspiración, también contar tus pestañas como hace tiempo te lo dije, y acariciar las yemas de tus dedos",
+"Dios ben, Dios bendiga esa shorty que me tiene rendido a sus pies, estrella de Belén con M, la que sigo sin cansancio",
+"Este saco de boxeo lleno de estrés, se aliviana con tu risa",
+"Tengo ganas de pisarte, porque no tengo ritmo ni sé bailar, pero tengo ganas de intentarlo contigo",
+"No quiero dejar de verte ni dejar de hablarte, no me basta con imaginarte",
+"Si la vida es contigo, la voy a disfrutar",
+"Soy tuyo namas, como el perdón del pecado, como la leña de la fogata, como el hilo de la aguja",
+"Chica cósmica, soy tu vaquero espacial, perdido en la galaxia de tus ojos",
+"Por traerme de cabeza, felicito a tus papás",
+"Preciosa, si tu supieras, yo te sigo a donde quieras hasta que me quieras",
+"Nadie me provoca lo que tú me das",
+"Te miré de pronto, y te empecé a querer, a imaginar tu mano y la mía, mi boca rozando la tuyo, y mis brazos envolviéndote con un fuerte abrazo",
+"Más de 100 cartas, contando las que desde hace tiempo te hago, y aún así tengo planes para más, otras 100 ahí te van linda",
+"Te dan ganas de ver mi cabello, pero mis ganas por ver el tuyo las triplican",
+"Lee y traduce la descripción de mi insta, la puse para ti",
+"Mejor que agua y aceite, más como limón con sal, coca con ron, mi alma se mezcla con la tuya, y mi risa combina con la tuya",
+"Pisa fondo y acelera mis latidos, todos mis sentidos ponlos mal",
+"Quiero ser un abrigo para taparte del frío, o el café que te da energía para continuar",
+"Hablo tanto, y yo deseando que me calles la boca",
+"Poesía mal hecha, pero entre cada línea está tu nombre",
+"Adoro la condena de estar atrapado en tus ojos",
+"Tienes unas cejas preciosas, pestañas bonitas, labios hermosos, una naricita que me fascina",
+"Mi corazón late en código morse, señales que se intensifican si te acercas",
+"Eres como un libro que nunca quiero terminar de leer, cada día descubro una página nueva y hermosa en ti",
+"La luz que te cargas me ilumina el rincón más oscuro de mi alma",
+"Yo no me desespero si tardas o no contestas, me das tiempo para escribirte lo que en un mensaje se queda corto",
+"Tu sabor lo probé un par de veces, y lo quiero tanto",
+"Me encantas de todas las formas posibles, contenta, despeinada, seria y hasta cuando te da pena",
+"Te voy a querer mañana y el triple pasado mañana, te seguiré escribiendo por mucho tiempo hasta que te hartes",
+"Me encantas con esa bata blanca y esa mente tan brillante que tienes, salvando al mundo mientras yo me derrito por ti",
+"Me encantas me encantas, tantas veces puedo repetirlo pero como no decirlo si es lo que siento",
+"En mi mente te tengo clonada, para nunca olvidarte",
+"Regálame de tu saliva para ahogarme en ella, y bucear un rato",
+"Te escribo tantas cosas, me llegan a la mente cosas que decirte cuando te veo caminar y sonreír",
+"Tengo un mapa mental de cada gesto tuyo que me ha hecho suspirar",
+"Si me dieran a elegir entre el éxito y un segundo más a tu lado, ya sabes cuál es la respuesta",
+"No soy un cursi anónimo, porque te lo muestro seguido, aunque sea de lejitos",
+"No tengo una carta definitiva o final, porque siempre me salen cosas nuevas que decirte",
+"Me enredas la vida de la forma más bonita, y no tengo ninguna intención de zafarme",
+"Eres esa chispa de magia en medio de la monotonía de los días grises",
+"Déjame desearte como antes lo he hecho, desearte que encuentres felicidad en días complicados, desearte que encuentres ropa bonita que al ponértela la hagas más bonita",
+"Te deseo éxito en tus metas, deseo que tengas buena salud para ti y los tuyos, deseo tenerte cerca, deseo que no tengas frío este invierno",
+"Deseo que la gente no sea mala contigo, deseo que tus ojitos no saquen lágrimas innecesarias, deseo que no leas esto tan rápido jajaja",
+"También quiero decirte quién eres, porque eres tanto para mí, eres la sonrisa que más me cautiva, eres la cara bonita por la que me derrito",
+"Eres la calma después de cualquier tormenta, el puerto seguro al que siempre quiero regresar",
+"Eres como un libro abierto que quiero releer mil veces sin saltarme ni una sola coma",
+"Quiero aprender a descifrar tus silencios igual de bien que descifro mis propios códigos",
+"Me tienes tan atrapado que ya ni intento disimular mi cara de bobo cuando me sales en mis notificaciones",
+"Aunque soy caos puro y estrés sin filtro, me entrego para que me uses de recipiente para tus malos ratos",
+"Puse esto en un contador y con las 100 anteriores, supuestamente son unas 2 mil palabras, y aún así las palabras faltan para describirte, para decir lo que siento, las palabras quedan cortas si tengo que escribirte",
+"Quisiera envolverte en un abrazo tan largo que se borren todas tus preocupaciones",
+"Me enamora tu vocación, tus ganas de ayudar y el amor que le pones a lo que haces",
+"Aunque nuestros gustos no coincidan, yo con gusto pruebo tu comida favorita o veo tu película favorita, solo para entenderte aún más",
+"Eres esa página que remarcó con cariño porque sé que la voy a releer mil veces",
+"Me gusta pensar que cada paso que doy, de alguna otra forma, me acerca más a ti",
+"Tienes una risa tan bonita que me cura el mal humor",
+"Que te quiero que te adoro, que tienes algo con lo que me obsesiono",
+"Que bonita y grata experiencia es pasar un día contigo",
+"Se mi deliro, se mi castigo, se mi obsesión, fuiste eres y serás, tantas cosas para mí",
+"Si te describiera con una palabra, sería ingobernable, o tal vez irreemplazable, o irrepetible, o preciosa,",
+"Intelectual, o valiente, o fuerte, o noble, o hermosa, o fría, o encantadora, o magnífica, o gobernante",
+"No puedo definirte o describirte solo puedo hacerlo con una sola palabra, hay miles y ni así se acercan a igualarte",
+"Esa mirada tuya me dice todo, no puedo dejar explicar como tu mirada me encanta",
+"Me gustas más que los videojuegos que me entretienen",
+"No eres diamantes, ni oro fundido, pero aún así, vales tanto para mi",
+"Acaba con estas ganas que tengo de mostrarte mi cariño, déjame abrazarte dame permiso de besarte, dame la chance de acariciarte",
+"Me siento bendecido y afortunado al tenerte en mi mente",
+"Cejas preciosas que me hipnotizan, en tus fotos no puedo dejar de verlas",
+"Esa boquita tuya me incita a pecar, yo con hambre y la quiero devorar",
+"Con antecedentes de monaguilla, yo el demonio que te quiere robar para tenerte cerca",
+"Pero también soy un hombre entregado a dios, que le reza para que estés bien",
+"El azul tu color favorito, pero yo te veo de rojo, boquita carmesí y pelo rojizo, eres como un arándano, y tú sabes que pienso de los arándanos",
+"Tu uniforme guarda historias de ciencia y salud, pero en mis brazos solo escribes poesía pura",
+"Hay días grises que se vuelven arte en cuanto me regalas un poco de atención",
+"No hay rincón en mis pensamientos donde tú no seas la protagonista",
+"Mis ojeras tan marcadas y tú con una sonrisa tan limpia",
+"Si hay días malos, y sí que los hay, recuerda que un tropiezo no destruye todo lo que has logrado",
+"Amo tus manos que salvan vida, y que acaricia mi alma y la sana",
+"Mientras más te escondas, más te quiero ver",
+"Estas lejos y eso me da miedo",
+"Olvide que número es, pero este capítulo como los anteriores son para ti, pensando en ti, queriéndote a ti",
+"No importa qué tan lejos camine, mis pensamientos siempre encuentran el camino de regreso a ti",
+"Quiero tu voz de alarma para levantarte contento",
+"Me siento con estilo cabrón, pero recuerdo que tú me ganas, que mujeron te ves tan ay, tan uff, que ganas de contemplarte un día entero",
+"Traes una mezcla de colores, sensaciones, emociones y sonidos, ese mix me fascina",
+"Tu dedicación me inspira a ser mejor cada día, a ponerle alma y pulso a todo lo que hago",
+"Gracias por ser ese refugio cálido donde el mundo exterior simplemente deja de importar",
+"Que aveces la inspiración se me escapa, para eso solo necesito cerrar los ojos y pensar en el brillo de tu mirada",
+"Admiro la fuerza con la que enfrentas el mundo y la ternura con la que me dejas entrar al tuyo",
+"Soy adicto a la nostalgia, un cazador de recuerdos felices, en los que siempre estás tú",
+"Aún con 200 se queda corto, me siento incompleto, porque me falta tanto que decirte"
+];
+
+var W = 64, cv = document.getElementById("f"), ctx = cv.getContext("2d");
+cv.width = cv.height = W;
+var tmp = document.createElement("canvas"); tmp.width = tmp.height = W;
+var tc = tmp.getContext("2d", {willReadFrequently: true});
+var PAP = [233,233,222], ROJO = [224,59,43], NAR = [247,184,74], AZ = [43,79,216];
+var cur = 0, target = 0;
+
+function hash(x, y){ var h = Math.sin(x*127.1 + y*311.7) * 43758.5453; return h - Math.floor(h); }
+
+function petalos(o, t){
+  tc.setTransform(1, 0, 0, 1, 0, 0); tc.clearRect(0, 0, W, W);
+  tc.setTransform(W/96, 0, 0, W/96, 0, 0);
+  tc.fillStyle = tc.strokeStyle = "#000";
+  var sw = Math.sin(t/900) * (0.04*(1 - o) + 0.006);
+  tc.lineWidth = 4; tc.beginPath(); tc.moveTo(48, 95);
+  tc.quadraticCurveTo(46 + sw*60, 84, 48 + sw*40, 60); tc.stroke();
+  tc.beginPath(); tc.ellipse(36, 86, 10, 3, -0.7, 0, 7); tc.fill();
+  tc.save(); tc.translate(48 + sw*40, 52); tc.rotate(sw);
+  for (var i = 0; i < 7; i++){
+    var k = (i - 3) / 3, a = k * (0.15 + 1.15*o);
+    var L = 30 + 16*o - Math.abs(k)*5*o, w = 6 + 4*o;
+    tc.save(); tc.rotate(a); tc.beginPath(); tc.ellipse(0, -L/2, w, L/2, 0, 0, 7); tc.fill(); tc.restore();
+  }
+  tc.beginPath(); tc.ellipse(0, -4*o, 33*o + 5, 22*o + 6, 0, 0, 7); tc.fill();
+  tc.restore();
+}
+
+function pintar(){
+  var d = tc.getImageData(0, 0, W, W).data, out = ctx.createImageData(W, W), o = out.data;
+  function s(x, y){ return x >= 0 && y >= 0 && x < W && y < W && d[(y*W + x)*4 + 3] > 110; }
+  for (var y = 0; y < W; y++) for (var x = 0; x < W; x++){
+    var c = null, h = hash(x, y);
+    if (s(x, y)){
+      c = PAP;
+      if (!s(x-1, y) || !s(x+1, y) || !s(x, y-1) || !s(x, y+1)){
+        if (h < 0.3) c = ROJO; else if (h < 0.55) c = NAR; else if (h < 0.64) c = AZ;
+      }
+    } else if ((s(x-1, y) || s(x+1, y) || s(x, y-1) || s(x, y+1)) && h < 0.26){
+      c = h < 0.18 ? PAP : NAR;
+    }
+    if (!c) continue;
+    var i = (y*W + x)*4; o[i] = c[0]; o[i+1] = c[1]; o[i+2] = c[2]; o[i+3] = 255;
+  }
+  ctx.putImageData(out, 0, 0);
+}
+
+function frame(t){
+  cur += (target - cur) * 0.07;
+  if (Math.abs(target - cur) < 0.002) cur = target;
+  petalos(cur, t); pintar();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+var num = document.getElementById("num"), carta = document.getElementById("carta"),
+    txt = document.getElementById("txt"), ayuda = document.getElementById("ayuda"), tok = 0, shown = 0;
+
+function ajustar(){
+  for (var s = 22; s >= 10; s--){
+    txt.style.fontSize = s + "px";
+    if (txt.offsetHeight <= carta.clientHeight) break;
+  }
+}
+window.addEventListener("resize", function(){ if (shown) ajustar(); });
+
+function cerrar(msg){ tok++; shown = 0; target = 0; carta.classList.remove("v"); ayuda.textContent = msg; }
+
+num.addEventListener("input", function(){
+  var v = num.value.trim(), n = parseInt(v, 10);
+  if (v.length < 3) return cerrar("Escribe un número del 101 al 200");
+  if (!(n >= 101 && n <= 200)) return cerrar("Solo del 101 al 200");
+  if (n === shown) return;
+  var mi = ++tok, estabaAbierta = target === 1;
+  shown = n; target = 0; carta.classList.remove("v"); ayuda.textContent = "carta " + n;
+  setTimeout(function(){
+    if (mi !== tok) return;
+    txt.textContent = CARTAS[n - 101]; ajustar(); target = 1;
+    setTimeout(function(){ if (mi === tok) carta.classList.add("v"); }, 700);
+  }, estabaAbierta ? 500 : 0);
+});
+</script>
+</body>
+</html>
